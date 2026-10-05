@@ -1,0 +1,54 @@
+version: "3.8"
+
+services:
+
+  account-service:
+    image: jayantrajput/skillfybank-account:v1
+    ports:
+      - "3000:3000"
+    networks:
+      - skillfybank-overlay
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 5s
+        order: stop-first
+
+  transaction-service:
+    image: jayantrajput/skillfybank-transaction:v1
+    networks:
+      - skillfybank-overlay
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      rollback_config:
+        parallelism: 1
+        delay: 5s
+        order: stop-first
+
+  notification-service:
+    image: jayantrajput/skillfybank-notification:v1
+    ports:
+      - "5000:5000"
+    networks:
+      - skillfybank-overlay
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+networks:
+  skillfybank-overlay:
+    external: true

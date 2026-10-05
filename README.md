@@ -58,3 +58,34 @@ swarm/
 kubernetes/
 istio/
 README.md
+
+## Docker Swarm
+
+### Swarm Architecture
+
+The Docker Swarm cluster consists of:
+
+- 3 Manager Nodes
+- 2 Worker Nodes
+
+The services are deployed as Docker Swarm services using Docker Stack.
+
+### Swarm Services
+
+| Service | Replicas | External Access |
+|---|---:|---|
+| Account Service | 2 | Port 3000 |
+| Transaction Service | 2 | Internal port 8080 |
+| Notification Service | 2 | Port 5000 |
+
+### Overlay Network
+
+An attachable Docker overlay network named `skillfybank-overlay`
+is used for communication between the services.
+
+### Stack Deployment
+
+```bash
+docker network create --driver overlay --attachable skillfybank-overlay
+
+docker stack deploy -c stack.yml skillfybank
