@@ -1,0 +1,11 @@
+.env
+*.pem
+*.key
+*.log
+target/
+node_modules/
+__pycache__/
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+.terraform.lock.hcl
