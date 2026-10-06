@@ -133,3 +133,32 @@ Worker failure
 Account Service task reallocation
 Continued overlay-network connectivity
 Restoration of the desired service replica counts
+
+
+### Worker Failure and Account Service Reallocation
+
+`swarm-worker-1` was deliberately stopped while hosting one
+Account Service replica.
+
+Before the failure:
+
+Account replica 1 → swarm-worker-2
+Account replica 2 → swarm-worker-1
+
+After swarm-worker-1 failed, Docker Swarm automatically
+created a replacement task on swarm-manager-2.
+
+The resulting placement was:
+
+Account replica 1 → swarm-worker-2
+Account replica 2 → swarm-manager-2
+
+The service returned to the desired state:
+
+2/2 replicas running
+
+The original task on swarm-worker-1 remained in the task history
+with a Shutdown state.
+
+This demonstrated Docker Swarm's self-healing and service
+reallocation capability after worker node failure.
