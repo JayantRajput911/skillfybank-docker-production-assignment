@@ -89,3 +89,17 @@ is used for communication between the services.
 docker network create --driver overlay --attachable skillfybank-overlay
 
 docker stack deploy -c stack.yml skillfybank
+
+
+Manager 3 failure
+        ↓
+Manager 1 remained Leader
+Manager 2 remained Reachable
+        ↓
+Transaction task on Manager 3 failed
+        ↓
+Swarm created replacement task
+        ↓
+Transaction returned to 2/2
+        ↓
+Overlay connectivity remained functional
