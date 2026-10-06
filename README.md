@@ -103,3 +103,33 @@ Swarm created replacement task
 Transaction returned to 2/2
         ↓
 Overlay connectivity remained functional
+
+
+### Worker Failure
+
+After validating Manager high availability, `swarm-worker-1`
+was deliberately stopped.
+
+Before the failure, Account Service had two replicas:
+
+```text
+Account replica 1 → swarm-worker-1
+Account replica 2 → swarm-worker-2
+
+After swarm-worker-1 was stopped, Docker Swarm detected the
+failed task and scheduled a replacement task on an available node.
+
+The Account Service was restored to:
+
+2/2 replicas running
+Combined Failure Test
+
+The failure simulation demonstrated:
+
+Non-leader manager failure
+Manager quorum preservation
+Transaction Service task reallocation
+Worker failure
+Account Service task reallocation
+Continued overlay-network connectivity
+Restoration of the desired service replica counts
