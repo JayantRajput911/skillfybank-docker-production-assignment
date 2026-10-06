@@ -162,3 +162,27 @@ with a Shutdown state.
 
 This demonstrated Docker Swarm's self-healing and service
 reallocation capability after worker node failure.
+
+## Docker Healthcheck
+
+A custom Docker HEALTHCHECK was added to the Notification Service.
+
+The healthcheck verifies the application's `/health` endpoint from
+inside the container:
+
+```dockerfile
+HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health', timeout=2)" || exit 1
+
+The Docker image was rebuilt and deployed as:
+jayantrajput/skillfybank-notification:v2
+
+The health status was verified using:
+docker inspect <CONTAINER_ID> \
+  --format '{{.State.Health.Status}}'
+
+The resulting status was:
+healthy
+
+This demonstrates application-level health monitoring using Docker's
+built-in HEALTHCHECK mechanism.
