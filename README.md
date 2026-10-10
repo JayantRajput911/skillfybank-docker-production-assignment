@@ -415,3 +415,14 @@ The validation checks Kubernetes service discovery, backend endpoint selection, 
 - Implement HTTP-header-based A/B routing.
 - Enable distributed tracing with Jaeger.
 - Configure retries and circuit-breaking policies.
+
+
+Istio Installation
+
+Installed Istio 1.31.1 on the Kubernetes 1.36 cluster.
+
+Used the demo installation profile for lab evaluation.
+
+Verified the installation using istioctl version, kubectl get pods -n istio-system, and kubectl get services -n istio-system.
+
+Used istioctl analyze -A to inspect the cluster configuration.
