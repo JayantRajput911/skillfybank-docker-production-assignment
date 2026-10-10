@@ -367,3 +367,40 @@ kubectl get nodes --show-labels
 #### Outcome
 
 The Notification Service is configured to run only on `k8s-worker-2`. The node's taint discourages unrelated workloads from being scheduled there unless they have an appropriate toleration. Kubernetes system components and other workloads with their own tolerations may still be present.
+
+
+### 3.X Kubernetes Service Connectivity Validation
+
+#### Objective
+
+Validate internal microservice connectivity through Kubernetes Services and test external access to Account and Notification Services.
+
+#### Internal Connectivity
+
+A temporary curl pod was used to test service discovery and health endpoints:
+
+```bash
+kubectl exec -n skillfybank service-test -- \
+  curl -sS http://transaction-service:8080/health
+
+kubectl exec -n skillfybank service-test -- \
+  curl -sS http://notification-service:5000/health
+
+kubectl exec -n skillfybank service-test -- \
+  curl -sS http://account-service:3000/health
+```
+
+#### External Connectivity
+
+Account Service is exposed through a NodePort Service. Notification Service uses a LoadBalancer Service definition and can be accessed through its assigned NodePort when no cloud load-balancer integration is configured.
+
+```bash
+kubectl get services -n skillfybank
+kubectl get endpoints -n skillfybank
+```
+
+External tests should be performed using the public IP of a Kubernetes node and the relevant NodePort, with security-group access restricted to the administrator's IP address.
+
+#### Outcome
+
+The validation checks Kubernetes service discovery, backend endpoint selection, internal communication, and external access. Record the actual command outputs and results observed during testing.
