@@ -186,3 +186,88 @@ healthy
 
 This demonstrates application-level health monitoring using Docker's
 built-in HEALTHCHECK mechanism.
+
+### Horizontal Pod Autoscaling (HPA) — Transaction Service
+
+#### Objective
+
+Configure Kubernetes Horizontal Pod Autoscaler (HPA) to automatically adjust the number of Transaction Service replicas based on CPU utilization.
+
+#### Implementation
+
+- Installed Metrics Server to provide CPU and memory metrics for Kubernetes pods and nodes.
+- Configured an HPA targeting the `transaction-service` Deployment.
+- Set the target average CPU utilization to 50%.
+- Configured a minimum of 2 replicas and a maximum of 5 replicas.
+- Generated application traffic against the Transaction Service to exercise autoscaling.
+
+#### Configuration
+
+Manifest: `kubernetes/hpa/transaction-hpa.yaml`
+
+Key settings:
+
+| Parameter | Value |
+|---|---|
+| Target Deployment | `transaction-service` |
+| Minimum replicas | 2 |
+| Maximum replicas | 5 |
+| Target CPU utilization | 50% |
+| Scaling API | `autoscaling/v2` |
+
+#### Verification
+
+Check HPA status:
+
+kubectl get hpa -n skillfybank
+
+
+Check CPU and memory usage:
+
+
+kubectl top pods -n skillfybank
+kubectl top nodes
+
+Check Transaction Service replicas:
+
+kubectl get deployment transaction-service -n skillfybank
+kubectl get pods -n skillfybank -l app=transaction-service
+
+
+Inspect HPA conditions and events:
+
+
+kubectl describe hpa transaction-service-hpa -n skillfybank
+
+
+#### Observed Results
+
+The HPA was successfully created, Metrics Server reported pod resource usage, and the Transaction Service scaled from its initial 2 replicas to 5 replicas.
+
+Example verification output:
+
+```text
+NAME                      REFERENCE                        TARGETS       MINPODS   MAXPODS   REPLICAS
+transaction-service-hpa   Deployment/transaction-service   cpu: 0%/50%   2         5         5
+```
+
+The Transaction Service Deployment reported:
+
+```text
+NAME                  READY   UP-TO-DATE   AVAILABLE
+transaction-service   5/5     5            5
+```
+
+All five replicas were ready at the time of verification.
+
+**Note:** The observed CPU utilization was 0% at the time of the final check. The five-replica state confirms the scale-up occurred, but a complete autoscaling test should also verify scale-down after load stops.
+
+#### Cleanup
+
+Delete the temporary load generator if it is still running:
+
+
+kubectl delete pod transaction-load -n skillfybank --ignore-not-found
+
+
+The HPA remains configured to manage the Transaction Service between 2 and 5 replicas.
