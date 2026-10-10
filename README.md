@@ -404,3 +404,14 @@ External tests should be performed using the public IP of a Kubernetes node and 
 #### Outcome
 
 The validation checks Kubernetes service discovery, backend endpoint selection, internal communication, and external access. Record the actual command outputs and results observed during testing.
+
+## Part 4: Istio Service Mesh
+
+### Objectives
+- Install Istio on the Kubernetes cluster.
+- Enable automatic sidecar injection for application workloads.
+- Enforce mutual TLS (mTLS) between services.
+- Configure weighted traffic routing for canary releases.
+- Implement HTTP-header-based A/B routing.
+- Enable distributed tracing with Jaeger.
+- Configure retries and circuit-breaking policies.
