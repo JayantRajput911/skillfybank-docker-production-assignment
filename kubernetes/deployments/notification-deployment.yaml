@@ -1,3 +1,4 @@
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,6 +14,13 @@ spec:
       labels:
         app: notification-service
     spec:
+      nodeSelector:
+        workload: notification
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: notification
+          effect: NoSchedule
       containers:
         - name: notification-service
           image: jayantrajput/skillfybank-notification:v2
@@ -31,3 +39,4 @@ spec:
             limits:
               cpu: "500m"
               memory: "256Mi"
+

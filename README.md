@@ -325,3 +325,45 @@ Recovery was verified by checking the Deployment image, pod readiness, and HPA s
 This exercise demonstrates how an invalid image reference can block a rollout, how Kubernetes Events and Deployment descriptions help identify the root cause, and how `kubectl rollout undo` restores the previous Deployment revision.
 
 The failed image tag was used only for testing and should not be retained as the active Deployment image.
+
+
+### Node Taints and Tolerations — Notification Service
+
+#### Objective
+
+Restrict Notification Service pods to a designated Kubernetes worker node using node labels, taints, tolerations, and a node selector.
+
+#### Configuration
+
+The designated node is `k8s-worker-2`.
+
+A node label identifies it as suitable for Notification Service workloads:
+
+```bash
+kubectl label node k8s-worker-2 workload=notification --overwrite
+```
+
+A taint prevents pods without a matching toleration from being scheduled on the node:
+
+```bash
+kubectl taint nodes k8s-worker-2 dedicated=notification:NoSchedule
+```
+
+The Notification Service Deployment uses:
+
+- **Node selector:** `workload=notification`
+- **Toleration:** `dedicated=notification:NoSchedule`
+
+Together, these settings allow Notification Service pods to run on the designated node and prevent this Deployment from being scheduled on other nodes.
+
+#### Verification
+
+```bash
+kubectl describe node k8s-worker-2
+kubectl get pods -n skillfybank -l app=notification-service -o wide
+kubectl get nodes --show-labels
+```
+
+#### Outcome
+
+The Notification Service is configured to run only on `k8s-worker-2`. The node's taint discourages unrelated workloads from being scheduled there unless they have an appropriate toleration. Kubernetes system components and other workloads with their own tolerations may still be present.
