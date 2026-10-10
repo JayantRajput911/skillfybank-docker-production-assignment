@@ -271,3 +271,57 @@ kubectl delete pod transaction-load -n skillfybank --ignore-not-found
 
 
 The HPA remains configured to manage the Transaction Service between 2 and 5 replicas.
+
+### Broken Deployment Rollout and Rollback
+
+#### Objective
+
+Simulate a failed Kubernetes Deployment rollout, diagnose the problem, and recover the application using Deployment rollback.
+
+#### Failure Simulation
+
+An invalid image tag was deliberately configured for the Transaction Service:
+
+```bash
+kubectl set image deployment/transaction-service \
+  transaction-service=jayantrajput/skillfybank-transaction:broken-tag \
+  -n skillfybank
+```
+
+The rollout was monitored using:
+
+```bash
+kubectl rollout status deployment/transaction-service \
+  -n skillfybank --timeout=90s
+```
+
+#### Troubleshooting
+
+The following commands were used to investigate the failed rollout:
+
+```bash
+kubectl get deployment transaction-service -n skillfybank
+kubectl get pods -n skillfybank -l app=transaction-service
+kubectl describe deployment transaction-service -n skillfybank
+kubectl describe pod <FAILED_POD_NAME> -n skillfybank
+kubectl logs deployment/transaction-service -n skillfybank --tail=50
+```
+
+The expected failure is an image-pull error, such as `ErrImagePull` or `ImagePullBackOff`, caused by the nonexistent image tag. Kubernetes pod Events provide the key diagnostic information when the container cannot start.
+
+#### Recovery
+
+The previous working Deployment revision was restored:
+
+```bash
+kubectl rollout undo deployment/transaction-service -n skillfybank
+kubectl rollout status deployment/transaction-service -n skillfybank
+```
+
+Recovery was verified by checking the Deployment image, pod readiness, and HPA status.
+
+#### Outcome
+
+This exercise demonstrates how an invalid image reference can block a rollout, how Kubernetes Events and Deployment descriptions help identify the root cause, and how `kubectl rollout undo` restores the previous Deployment revision.
+
+The failed image tag was used only for testing and should not be retained as the active Deployment image.
